@@ -2,6 +2,7 @@ import streamlit as st
 import pickle
 import pandas as pd
 from tensorflow.keras.models import load_model
+from types import MethodType
 
 # Load the trained model and necessary objects
 model = load_model('my_model.h5')
@@ -50,13 +51,13 @@ if st.button("Predict Churn"):
 
     # Preprocess the input data
     input_df = pd.DataFrame([input_data])
-    input_df['Gender'] = label_encoder.transform(input_df['Gender'])
-    geo_encoded = onehotencoder_geo.transform(input_df[['Geography']]).toarray()
-    geo_encoded_df = pd.DataFrame(geo_encoded, columns=onehotencoder_geo.get_feature_names_out(['Geography']))
-    input_df = pd.concat([input_df.drop("Geography", axis=1), geo_encoded_df], axis=1)
-    card_encoded = onehotencoder_card.transform(input_df[['Card Type']]).toarray()
-    card_encoded_df = pd.DataFrame(card_encoded, columns=onehotencoder_card.get_feature_names_out(['Card Type']))
-    input_df = pd.concat([input_df.drop("Card Type", axis=1), card_encoded_df], axis=1)
+input_df['Gender'] = label_encoder.transform(input_df['Gender'])
+geo_encoded = onehotencoder_geo.transform(input_df[['Geography']])  # Removed .toarray()
+geo_encoded_df = pd.DataFrame(geo_encoded, columns=onehotencoder_geo.get_feature_names_out(['Geography']))
+input_df = pd.concat([input_df.drop("Geography", axis=1), geo_encoded_df], axis=1)
+card_encoded = onehotencoder_card.transform(input_df[['Card Type']])  # Removed .toarray()
+card_encoded_df = pd.DataFrame(card_encoded, columns=onehotencoder_card.get_feature_names_out(['Card Type']))
+input_df = pd.concat([input_df.drop("Card Type", axis=1), card_encoded_df], axis=1)
 
     # Get the columns used during training
     training_columns = ['CreditScore', 'Gender', 'Age', 'Tenure', 'Balance', 'NumOfProducts',
